@@ -6,8 +6,8 @@ use ncurses::*;
 
 // ascii brightness = " .:-=+*#%@"
 const SHADOW: [u32; 10] = [
-    ' ' as u32, '.' as u32, ':' as u32, '-' as u32, '=' as u32,
-    '+' as u32, '*' as u32, '#' as u32, '%' as u32, '@' as u32,
+    ' ' as u32, '.' as u32, ':' as u32, '-' as u32, '=' as u32, '+' as u32, '*' as u32, '#' as u32,
+    '%' as u32, '@' as u32,
 ];
 
 #[derive(Debug)]
@@ -29,7 +29,6 @@ impl Face {
             dr: (-mid, -mid),
             len: size,
         };
-
         return new_face;
     }
 }
@@ -43,7 +42,7 @@ fn main() -> () {
     curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
 
     let center = ((COLS() - 1) / 2 + 1, (LINES() - 1) / 2 + 1);
-    let mut face = Face::create(6);
+    let mut face = Face::create(3);
 
     draw_axis(center);
     draw_face(&face, (center.1 - face.ul.0, center.0 - face.ul.1));
@@ -53,15 +52,24 @@ fn main() -> () {
 }
 
 fn draw_face(face: &Face, pos: (i32, i32)) {
-    let mut x = 0; let mut y = 0;
+    let mut x = 0;
+    let mut y = 0;
 
-    mv(pos.0, pos.1);
+    if face.len % 2 == 0 {
+        mv(pos.0, pos.1 - face.len / 2 + 1);
+    } else {
+        mv(pos.0, pos.1 - face.len / 2);
+    }
     for _i in 0..face.len {
-        for _j in 0..face.len {
+        for _j in 0..face.len * 2 - 1 {
             addch(SHADOW[9]);
         }
         getyx(stdscr(), &mut y, &mut x);
-        mv(y + 1, pos.1);
+        if face.len % 2 == 0 {
+            mv(y + 1, pos.1 - face.len / 2 + 1);
+        } else {
+            mv(y + 1, pos.1 - face.len / 2);
+        }
     }
 }
 
