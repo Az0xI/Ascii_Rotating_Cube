@@ -1,8 +1,6 @@
-// Inport the crate ncurses
-extern crate ncurses;
-
-// Import all ncurses function as it's own (without calling int in a struct)
-use ncurses::*;
+// Import all the crate
+use ratatui;
+use crossterm::event;
 
 // ascii brightness = " .:-=+*#%@"
 const SHADOW: [u32; 10] = [
@@ -35,20 +33,32 @@ impl Face {
 
 // main function
 fn main() -> () {
-    //Init Ncurses Window
-    initscr();
-    cbreak();
-    noecho();
-    curs_set(CURSOR_VISIBILITY::CURSOR_INVISIBLE);
+    // Init terminal
+    let terminal = ratatui::init();
+    let result = game_loop(terminal);
+    let face = Face::create(5);
 
-    let center = ((COLS() - 1) / 2 + 1, (LINES() - 1) / 2 + 1);
-    let mut face = Face::create(3);
+    //draw_axis(center);
+    //draw_point(&face, center);
+    //draw_face(&face, (center.1 - face.ul.0, center.0 - face.ul.1));
+    ratatui::restore();
+    result
+}
 
-    draw_axis(center);
-    draw_face(&face, (center.1 - face.ul.0, center.0 - face.ul.1));
-    refresh();
-    getch();
-    endwin();
+fn game_loop(mut terminal: ratatui::DefaultTerminal) {
+    loop {
+        terminal.draw(render);
+        if matches!(event::read()?, Event::Key(_)) {
+            break Ok(());
+        }
+    }
+}
+
+fn render(frame: &mut Frame) {
+    frame.render_widget("hello world", frame.area());
+}
+/*fn draw_point(face: &Face, pos: (i32, i32)) {
+    addch('A' as u32);
 }
 
 fn draw_face(face: &Face, pos: (i32, i32)) {
@@ -72,7 +82,7 @@ fn draw_face(face: &Face, pos: (i32, i32)) {
         }
     }
 }
-
+;8u
 fn draw_axis(center: (i32, i32)) {
     let mut max_x = 0;
     let mut max_y = 0;
@@ -94,4 +104,6 @@ fn draw_axis(center: (i32, i32)) {
     }
     mv(center.1, center.0);
     addch('+' as u32);
+    mv(0, 0);
 }
+ */
