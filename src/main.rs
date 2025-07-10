@@ -46,9 +46,15 @@ fn main() -> () {
 
     draw_axis(center);
     draw_face(&face, (center.1 - face.ul.0, center.0 - face.ul.1));
+    draw_point(&face, center);
     refresh();
     getch();
     endwin();
+}
+
+fn draw_point(face: &Face, center: (i32, i32)) {
+    mv(center.1 + face.ul.1, center.0 + face.ul.0);
+    addch('o' as u32);
 }
 
 fn draw_face(face: &Face, pos: (i32, i32)) {
