@@ -1,11 +1,10 @@
-use std::io::{stdout, Write};
 use crossterm::{
     cursor::{MoveDown, MoveLeft, MoveTo},
-    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::size,
     queue,
+    style::{Print},
+    terminal::size,
 };
-
+use std::io::{stdout, Write};
 
 struct TermInfo {
     size: (u16, u16),
@@ -27,7 +26,9 @@ impl TermInfo {
 }
 
 fn normalize_coo(coo: (u16, u16), info: TermInfo) -> (u16, u16) {
-    coo
+    let new_coo: (u16, u16) = (coo.0 + info.center.0, coo.1 + info.center.1);
+
+    new_coo
 }
 
 pub fn axis() -> std::io::Result<()> {

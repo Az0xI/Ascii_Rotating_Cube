@@ -1,14 +1,17 @@
 // Import all the crate
 use crossterm::{
-    cursor::{Hide, MoveDown, MoveLeft, MoveTo, Show},
-    event::{poll, read},
-    execute, queue,
-    style::{Color, Print, ResetColor, SetBackgroundColor, SetForegroundColor},
-    terminal::{size, Clear, ClearType, EnterAlternateScreen, LeaveAlternateScreen, SetTitle},
+    cursor::{Hide, Show},
+    event::{read, Event, KeyCode},
+    execute,
+    terminal::{
+        disable_raw_mode, enable_raw_mode, EnterAlternateScreen, LeaveAlternateScreen, SetTitle,
+    },
+    tty::IsTty,
 };
-use std::io::{stdout, Write};
+use std::io::stdout;
 
-mod face; mod draw;
+mod draw;
+mod face;
 mod point;
 
 // ascii brightness = " .:-=+*#%@"
@@ -19,6 +22,11 @@ const SHADOW: [u32; 10] = [
 
 // main function
 fn main() -> std::io::Result<()> {
+    if !stdout().is_tty() {
+        println!("The program must be launched in a terminal in order to work");
+        return Ok(());
+    }
+
     // Init terminal
     execute!(
         stdout(),
@@ -26,11 +34,22 @@ fn main() -> std::io::Result<()> {
         Hide,
         SetTitle("Rotating_Cube"),
     )?;
-    let point = point::Point::new(0.0, 0.0, 0.0);
+    enable_raw_mode()?;
+
     draw::axis()?;
-    std::thread::sleep(std::time::Duration::from_secs(3));
+    loop {
+        match read()? {
+            Event::Key(event) => {
+                if event.code == KeyCode::Char('q') {
+                    break;
+                }
+            }
+            _ => (),
+        };
+    }
 
     // Reset terminal
     execute!(stdout(), LeaveAlternateScreen, Show)?;
+    disable_raw_mode()?;
     Ok(())
 }
