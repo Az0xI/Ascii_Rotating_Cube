@@ -1,7 +1,7 @@
 use crossterm::{
     cursor::{MoveDown, MoveLeft, MoveTo},
     queue,
-    style::{Print},
+    style::Print,
     terminal::size,
 };
 use std::io::{stdout, Write};
